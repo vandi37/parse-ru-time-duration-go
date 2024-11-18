@@ -44,7 +44,7 @@ func Parser(data string) (time.Duration, error) {
 		var durType = FindDurationType(p)
 
 		// If the type is not valid
-		if durType < 0 || durType > 6 {
+		if durType < 0 || durType > 7 {
 			return 0, vanerrors.NewHTTP("unknown word", 400, nil)
 		}
 		// Adding the type and current num to the result
@@ -64,8 +64,9 @@ func Parser(data string) (time.Duration, error) {
 // 1 - minute
 // 2 - hour
 // 3 - day
-// 4 - month
-// 5 - year
+// 4 - week
+// 5 - month
+// 6 - year
 //
 // Your can use parse.Types[] for getting the time.Duration data
 func FindDurationType(str string) int {
@@ -80,21 +81,24 @@ func FindDurationType(str string) int {
 		return 2
 	case "д", "дня", "дню", "день", "днём", "дне", "дней", "дням", "дни", "днями", "днях":
 		return 3
-	case "мес", "месяц", "месяца", "месяцу", "месяцем", "месяце", "месяцы", "месяцев", "месяцам", "месяцами", "месяцах":
+	case "н", "нед", "неделя", "недели", "неделе", "неделю", "неделей", "недель", "неделям", "неделями", "неделях":
 		return 4
-	case "г", "л", "год", "года", "году", "годом", "лет", "годам", "годы", "годами", "годах":
+	case "мес", "месяц", "месяца", "месяцу", "месяцем", "месяце", "месяцы", "месяцев", "месяцам", "месяцами", "месяцах":
 		return 5
+	case "г", "л", "год", "года", "году", "годом", "лет", "годам", "годы", "годами", "годах":
+		return 6
 	default:
 		return -1
 	}
 }
 
 // The duration types
-var Types [6]time.Duration = [6]time.Duration{
+var Types [7]time.Duration = [7]time.Duration{
 	time.Second,          // second (0)
 	time.Minute,          // minute (1)
 	time.Hour,            // hour (2)
 	time.Hour * 24,       // day (3)
-	time.Hour * 24 * 30,  // month (4)
-	time.Hour * 24 * 365, // year (5)
+	time.Hour * 24 * 7,   // week (4)
+	time.Hour * 24 * 30,  // month (5)
+	time.Hour * 24 * 365, // year (6)
 }
