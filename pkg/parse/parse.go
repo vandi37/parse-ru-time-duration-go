@@ -9,6 +9,12 @@ import (
 	"github.com/VandiKond/vanerrors"
 )
 
+// Error constants
+const (
+	NoTypeAfterNumber = "no type after number"
+	UnknownWord       = "unknown word"
+)
+
 // Parses russian expression to time.Duration type
 func Parser(data string) (time.Duration, error) {
 	// Setting the result
@@ -28,7 +34,7 @@ func Parser(data string) (time.Duration, error) {
 		if err == nil {
 			// Two numbers in a row not allowed
 			if lastWasNum {
-				return 0, vanerrors.NewHTTP("two numbers in a row", http.StatusBadRequest, nil)
+				return 0, vanerrors.NewHTTP(NoTypeAfterNumber, http.StatusBadRequest, nil)
 			}
 			// Setting helper variables
 			currentNum = time.Duration(num)
@@ -38,20 +44,23 @@ func Parser(data string) (time.Duration, error) {
 		}
 		// Two non numbers in a row not allowed
 		if !lastWasNum {
-			return 0, vanerrors.NewHTTP("two non numbers in a row", http.StatusBadRequest, nil)
+			currentNum = 1
 		}
 		// Finding the type
 		var durType = FindDurationType(p)
 
 		// If the type is not valid
 		if durType < 0 || durType > 7 {
-			return 0, vanerrors.NewHTTP("unknown word", 400, nil)
+			return 0, vanerrors.NewHTTP(UnknownWord, 400, nil)
 		}
 		// Adding the type and current num to the result
 		result += Types[durType] * currentNum
 
 		// Setting handler variable
 		lastWasNum = false
+	}
+	if lastWasNum {
+		return 0, vanerrors.NewHTTP(NoTypeAfterNumber, http.StatusBadRequest, nil)
 	}
 
 	// Returning the result

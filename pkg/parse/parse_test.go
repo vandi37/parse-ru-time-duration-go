@@ -1,16 +1,21 @@
 package parse_test
 
 import (
+	"net/http"
 	"testing"
 	"time"
 
 	"github.com/VandiKond/parse-ru-time-duration-go/pkg/parse"
+	"github.com/VandiKond/vanerrors"
 )
 
 func TestParse(t *testing.T) {
 	var testCases = []struct {
-		input  string
-		output time.Duration
+		input    string
+		output   time.Duration
+		hasError bool
+		httpCode int
+		errName  string
 	}{
 		{
 			input:  "1 мин",
@@ -49,43 +54,77 @@ func TestParse(t *testing.T) {
 			output: time.Hour * 24 * 7,
 		},
 		{
-			input:  "2 недели 1 день 5 часов",
-			output: (time.Hour * 24 * 7 * 2) + (time.Hour * 24) + (time.Hour * 5),
+			input:  "2 недели 1 день",
+			output: (time.Hour * 24 * 7 * 2) + (time.Hour * 24 * 1),
 		},
 		{
-			input:  "10 сек",
-			output: time.Second * 10,
+			input:  "1 месяц",
+			output: time.Hour * 24 * 30,
 		},
 		{
-			input:  "1 м",
-			output: time.Minute,
+			input:  "2 года",
+			output: time.Hour * 24 * 365 * 2,
 		},
 		{
-			input:  "2 ч",
-			output: time.Hour * 2,
+			input:  "1 год 2 месяца 3 дня",
+			output: (time.Hour * 24 * 365) + (time.Hour * 24 * 30 * 2) + (time.Hour * 24 * 3),
 		},
 		{
-			input:  "3 д",
-			output: time.Hour * 24 * 3,
+			input:    "123",
+			hasError: true,
+			httpCode: http.StatusBadRequest,
+			errName:  parse.NoTypeAfterNumber,
 		},
 		{
-			input:  "1 н",
-			output: time.Hour * 24 * 7,
+			input:    "123 abc",
+			hasError: true,
+			httpCode: http.StatusBadRequest,
+			errName:  parse.UnknownWord,
 		},
 		{
-			input:  "0 мин",
-			output: time.Duration(0),
+			input:    "1 мин 2",
+			hasError: true,
+			httpCode: http.StatusBadRequest,
+			errName:  parse.NoTypeAfterNumber,
+		},
+		{
+			input:    "abc",
+			hasError: true,
+			httpCode: http.StatusBadRequest,
+			errName:  parse.UnknownWord,
+		},
+		{
+			input:    "1 мин abc",
+			hasError: true,
+			httpCode: http.StatusBadRequest,
+			errName:  parse.UnknownWord,
+		},
+		{
+			input:  "1 с 2 м 3 ч 4 д 5 н 6 мес 7 г",
+			output: time.Second + (time.Minute * 2) + (time.Hour * 3) + (time.Hour * 24 * 4) + (time.Hour * 24 * 7 * 5) + (time.Hour * 24 * 30 * 6) + (time.Hour * 24 * 365 * 7),
 		},
 	}
 
-	for _, c := range testCases {
-		t.Run(c.input, func(t *testing.T) {
-			var got, err = parse.Parser(c.input)
-			if err != nil {
-				t.Fatalf("got error %s expected no errors", err.Error())
-			}
-			if got != c.output {
-				t.Fatalf("got %s, expected %s", got, c.output)
+	for _, tc := range testCases {
+		t.Run(tc.input, func(t *testing.T) {
+			duration, err := parse.Parser(tc.input)
+			if tc.hasError {
+				if err == nil {
+					t.Errorf("Expected error, but got nil")
+				}
+				if vanerrors.GetCode(err) != tc.httpCode {
+					t.Errorf("Expected HTTP status code %d, but got %d", tc.httpCode, vanerrors.GetCode(err))
+				}
+				if vanerrors.GetName(err) != tc.errName {
+					t.Errorf("Expected error message '%s', but got '%s'", tc.errName, vanerrors.GetName(err))
+				}
+			} else {
+				if err != nil {
+					t.Errorf("Unexpected error: %v", err)
+				}
+				if duration != tc.output {
+					t.Errorf("Expected duration %v, but got %v", tc.output, duration)
+				}
 			}
 		})
 	}
