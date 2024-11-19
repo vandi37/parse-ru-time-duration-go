@@ -7,6 +7,6 @@ import (
 )
 
 func main() {
-	app := application.New(time.Second * 10)
+	app := application.New(time.Hour)
 	app.Run()
 }

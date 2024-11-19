@@ -1,7 +1,6 @@
 package application
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -26,9 +25,12 @@ func NewService() *Application {
 func New(d time.Duration) *Application {
 	return &Application{
 		Duration: d,
+		Config: Config{
+			Handler: server_http.ParseHandler{
+				Url: ":8080",
+			}},
 	}
 }
-
 func (a *Application) Run() error {
 	// Exiting in duration
 	defer log.Printf("application stopped before timeout")
@@ -53,7 +55,6 @@ func (a *Application) ExitTimeOut() {
 	time.Sleep(a.Duration)
 
 	// Exiting after timeout
-	fmt.Println("")
 	log.Printf("timeout %s has passed. Ending the program", a.Duration)
 	os.Exit(418)
 }
