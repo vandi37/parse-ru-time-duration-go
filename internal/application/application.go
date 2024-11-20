@@ -19,7 +19,13 @@ type Application struct {
 }
 
 func NewService() *Application {
-	return &Application{}
+	return &Application{
+		IsService: true,
+		Config: Config{
+			Handler: server_http.ParseHandler{
+				Url: ":8080",
+			}},
+	}
 }
 
 func New(d time.Duration) *Application {
