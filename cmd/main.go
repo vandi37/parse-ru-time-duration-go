@@ -3,7 +3,7 @@ package main
 import (
 	"time"
 
-	"github.com/VandiKond/parse-ru-time-duration-go/internal/application"
+	"github.com/vandi37/parse-ru-time-duration-go/internal/application"
 )
 
 func main() {
