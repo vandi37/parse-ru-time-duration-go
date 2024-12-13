@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/VandiKond/vanerrors"
+	"github.com/vandi37/vanerrors"
 )
 
 // Error constants
@@ -34,7 +34,7 @@ func Parser(data string) (time.Duration, error) {
 		if err == nil {
 			// Two numbers in a row not allowed
 			if lastWasNum {
-				return 0, vanerrors.NewHTTP(NoTypeAfterNumber, http.StatusBadRequest, nil)
+				return 0, vanerrors.NewHTTP(NoTypeAfterNumber, http.StatusBadRequest, vanerrors.EmptyHandler)
 			}
 			// Setting helper variables
 			currentNum = time.Duration(num)
@@ -51,7 +51,7 @@ func Parser(data string) (time.Duration, error) {
 
 		// If the type is not valid
 		if durType < 0 || durType > 7 {
-			return 0, vanerrors.NewHTTP(UnknownWord, 400, nil)
+			return 0, vanerrors.NewHTTP(UnknownWord, 400, vanerrors.EmptyHandler)
 		}
 		// Adding the type and current num to the result
 		result += Types[durType] * currentNum
@@ -60,7 +60,7 @@ func Parser(data string) (time.Duration, error) {
 		lastWasNum = false
 	}
 	if lastWasNum {
-		return 0, vanerrors.NewHTTP(NoTypeAfterNumber, http.StatusBadRequest, nil)
+		return 0, vanerrors.NewHTTP(NoTypeAfterNumber, http.StatusBadRequest, vanerrors.EmptyHandler)
 	}
 
 	// Returning the result

@@ -4,8 +4,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/VandiKond/vanerrors"
 	"github.com/vandi37/parse-ru-time-duration-go/pkg/parse"
+	"github.com/vandi37/vanerrors"
 )
 
 // The url
