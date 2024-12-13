@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	server_http "github.com/VandiKond/parse-ru-time-duration-go/internal/http"
-	"github.com/VandiKond/parse-ru-time-duration-go/pkg/parse"
+	server_http "github.com/vandi37/parse-ru-time-duration-go/internal/http"
+	"github.com/vandi37/parse-ru-time-duration-go/pkg/parse"
 )
 
 func TestHandler(t *testing.T) {
