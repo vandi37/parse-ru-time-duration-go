@@ -39,7 +39,7 @@ The project should take from one to four days
 
 - set application structure -> done 17.11.24
 - Create parsing func -> done 17.11.24
-- Create unit tests -> not done
-- Create http server -> not done
-- Create unit tests #2 -> not done
+- Create unit tests -> done 17.11.24/18.11.24
+- Create http server -> done 17.11.24/18.11.24/19.11.24
+- Create unit tests #2 -> done 19.11.24
 - v1.0.0 -> not done

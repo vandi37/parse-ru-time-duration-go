@@ -1,7 +1,6 @@
 package server_http
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 
@@ -17,27 +16,29 @@ func (u Url) GetUrl() Url {
 }
 
 // Starting the server
-func (h *ParseHandler) Start() error {
+func (h ParseHandler) Start() error {
 	err := http.ListenAndServe(string(h.GetUrl()), h)
 	return err
 }
 
 // Serving the server
-func (h *ParseHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h ParseHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "CouldNotReadBody", http.StatusInternalServerError)
+		return
 	}
 	result, err := parse.Parser(string(body))
 	if err != nil {
 		errName := vanerrors.GetName(err)
 		if errName == "" {
-			http.Error(w, "InternalServerError", http.StatusInternalServerError)
+			errName = "InternalServerError"
 		}
 		errCode := vanerrors.GetCode(err)
 		http.Error(w, errName, errCode)
+		return
 	}
-	w.Write([]byte(fmt.Sprint(result)))
+	w.Write([]byte(result.String()))
 }
 
 // The handler struct
